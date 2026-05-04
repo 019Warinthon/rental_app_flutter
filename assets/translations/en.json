@@ -1,0 +1,17 @@
+{
+  "app_name": "RentSpace",
+  "home": "Home",
+  "saved": "Saved",
+  "profile": "Profile",
+  "search_hint": "Search rooms or locations...",
+  "featured_rooms": "Featured Rooms",
+  "view_all": "View all",
+  "recommended": "Recommended for you",
+  "book_now": "Book Now",
+  "my_bookings": "My Bookings",
+  "settings": "Settings",
+  "language": "Language",
+  "logout": "Logout",
+  "account": "Account",
+  "support": "Support"
+}

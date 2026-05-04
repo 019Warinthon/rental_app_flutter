@@ -1,0 +1,17 @@
+{
+  "app_name": "RentSpace",
+  "home": "หน้าแรก",
+  "saved": "ที่บันทึกไว้",
+  "profile": "โปรไฟล์",
+  "search_hint": "ค้นหาห้องพักหรือสถานที่...",
+  "featured_rooms": "ห้องพักยอดนิยม",
+  "view_all": "ดูทั้งหมด",
+  "recommended": "แนะนำสำหรับคุณ",
+  "book_now": "จองตอนนี้",
+  "my_bookings": "การจองของฉัน",
+  "settings": "การตั้งค่า",
+  "language": "ภาษา",
+  "logout": "ออกจากระบบ",
+  "account": "บัญชี",
+  "support": "ช่วยเหลือ"
+}
