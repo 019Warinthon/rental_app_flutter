@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/config/colors.dart';
-import '../../../core/config/typography.dart';
+import 'package:rental_app/core/config/colors.dart';
+import 'package:rental_app/core/config/typography.dart';
 import 'image_editor_cropper.dart';
 
 enum ImageEditorMode {
@@ -118,15 +118,6 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
       _isSaving = true;
     });
 
-    // แสดง Loading simple แบบมาตรฐาน
-    if (mounted) {
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => const Center(child: CircularProgressIndicator()),
-      );
-    }
-
     try {
       Uint8List? resultBytes;
       double? posX, posY, scale;
@@ -156,19 +147,11 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
             return;
           }
 
-          // ปิด Loading
-          if (mounted) Navigator.of(context, rootNavigator: true).pop();
-
-          if (widget.successMessage != null && mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(widget.successMessage!)),
-            );
-          }
+          if (widget.successMessage != null) {}
           handleBack();
         } else {
           // No custom onSave, so we close the dialog and pop with result
           if (mounted) {
-            Navigator.of(context, rootNavigator: true).pop(); // ปิด Loading
             context.pop(
               ImageEditorResult(
                 bytes: resultBytes,
@@ -179,16 +162,9 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
             );
           }
         }
-      } else {
-        if (mounted) Navigator.of(context, rootNavigator: true).pop();
-      }
+      } else {}
     } catch (e) {
-      if (mounted) {
-        Navigator.of(context, rootNavigator: true).pop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('เกิดข้อผิดพลาด: $e'), backgroundColor: Colors.red),
-        );
-      }
+      if (mounted) {}
     } finally {
       if (mounted) {
         setState(() {
@@ -207,17 +183,17 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
         handleBack();
       },
       child: Scaffold(
-        backgroundColor: Colors.black,
+        backgroundColor: AppColors.secondary,
         appBar: AppBar(
           backgroundColor: Colors.black,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            icon: Icon(Icons.arrow_back, color: AppColors.background),
             onPressed: () => handleBack(),
           ),
           title: Text(
             widget.title,
             style: AppTypography.fontTitleMediumProminent(
-              color: Colors.white,
+              color: AppColors.background,
             ),
           ),
           actions: [
@@ -244,7 +220,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
                   child: Text(
                     'บันทึก',
                     style: AppTypography.fontBodyMediumProminent(
-                      color: Colors.white,
+                      color: AppColors.background,
                     ),
                   ),
                 ),
@@ -262,7 +238,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
             isCircle:
                 widget.mode == ImageEditorMode.crop &&
                 widget.aspectRatio == 1.0,
-            overlayColor: Colors.black.withOpacity(0.5),
+            overlayColor: AppColors.primary.withValues(alpha: 0.5),
           ),
         ),
       ),
