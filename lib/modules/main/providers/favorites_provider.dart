@@ -1,41 +1,81 @@
 import 'package:flutter/material.dart';
 import '../../home/models/room_model.dart';
-import '../../../core/storage/app_storage.dart';
+import '../services/favorite_service.dart';
 
 class FavoritesProvider with ChangeNotifier {
-  final List<RoomModel> _favorites = [];
-  bool _loaded = false;
+  final FavoriteService _favoriteService = FavoriteService();
+  List<RoomModel> _favorites = [];
+  bool _isLoading = false;
+  String _currentUserId = '';
 
   List<RoomModel> get favorites => List.unmodifiable(_favorites);
+  bool get isLoading => _isLoading;
 
   bool isFavorite(String roomId) {
     return _favorites.any((room) => room.id == roomId);
   }
 
-  /// Call this once rooms are available (e.g., after HomeProvider fetches).
-  /// Re-hydrates favorites from disk using saved IDs.
-  Future<void> loadFromDisk(List<RoomModel> availableRooms) async {
-    if (_loaded) return;
-    _loaded = true;
-    final savedIds = await AppStorage.getFavoriteIds();
-    if (savedIds.isEmpty) return;
-    final restored = availableRooms.where((r) => savedIds.contains(r.id));
-    _favorites.addAll(restored);
+  void updateUser(String userId) {
+    if (_currentUserId != userId) {
+      _currentUserId = userId;
+      if (userId.isNotEmpty) {
+        fetchFavorites(userId);
+      } else {
+        clearFavorites();
+      }
+    }
+  }
+
+  Future<void> fetchFavorites(String userId) async {
+    if (userId.isEmpty) {
+      _favorites = [];
+      notifyListeners();
+      return;
+    }
+
+    _isLoading = true;
+    notifyListeners();
+
+    _favorites = await _favoriteService.fetchFavorites(userId);
+
+    _isLoading = false;
     notifyListeners();
   }
 
-  Future<void> toggleFavorite(RoomModel room) async {
-    if (isFavorite(room.id)) {
+  Future<void> toggleFavorite(RoomModel room, String userId) async {
+    if (userId.isEmpty) return; // Must be logged in
+
+    final isFav = isFavorite(room.id);
+
+    // Optimistic UI update
+    if (isFav) {
       _favorites.removeWhere((r) => r.id == room.id);
     } else {
       _favorites.add(room);
     }
     notifyListeners();
-    await _persist();
+
+    // Sync with backend
+    bool success;
+    if (isFav) {
+      success = await _favoriteService.removeFavorite(userId, room.id);
+    } else {
+      success = await _favoriteService.addFavorite(userId, room.id);
+    }
+
+    // Revert if failed
+    if (!success) {
+      if (isFav) {
+        _favorites.add(room);
+      } else {
+        _favorites.removeWhere((r) => r.id == room.id);
+      }
+      notifyListeners();
+    }
   }
 
-  Future<void> _persist() async {
-    final ids = _favorites.map((r) => r.id).toList();
-    await AppStorage.saveFavoriteIds(ids);
+  void clearFavorites() {
+    _favorites = [];
+    notifyListeners();
   }
 }

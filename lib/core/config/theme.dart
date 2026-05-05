@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'colors.dart';
+import 'typography.dart';
 
 class AppTheme {
   static ThemeData get lightTheme {
+    final textTheme = AppTypography.createTextTheme();
+
     return ThemeData(
       useMaterial3: true,
       scaffoldBackgroundColor: AppColors.background,
@@ -16,50 +18,51 @@ class AppTheme {
         onSecondary: Colors.white,
         onSurface: AppColors.textPrimary,
       ),
-      textTheme: GoogleFonts.interTextTheme().copyWith(
-        displayLarge: GoogleFonts.inter(color: AppColors.textPrimary, fontWeight: FontWeight.bold),
-        titleLarge: GoogleFonts.inter(color: AppColors.textPrimary, fontWeight: FontWeight.w600),
-        bodyLarge: GoogleFonts.inter(color: AppColors.textPrimary),
-        bodyMedium: GoogleFonts.inter(color: AppColors.textSecondary),
-      ),
+
+      textTheme: textTheme,
+
       appBarTheme: AppBarTheme(
         backgroundColor: AppColors.background,
         elevation: 0,
         centerTitle: true,
         iconTheme: const IconThemeData(color: AppColors.textPrimary),
-        titleTextStyle: GoogleFonts.inter(
-          color: AppColors.textPrimary,
-          fontSize: 18,
-          fontWeight: FontWeight.w600,
-        ),
+        titleTextStyle: textTheme.headlineSmall, // Anuphan 20px
       ),
+
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
           foregroundColor: Colors.white,
-          minimumSize: const Size(double.infinity, 50),
+          minimumSize: const Size(double.infinity, 56),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16),
           ),
           elevation: 0,
-          textStyle: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 16),
+          textStyle: textTheme.labelLarge, // Sarabun 14px bold
         ),
       ),
+
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.surface,
-        hintStyle: GoogleFonts.inter(color: AppColors.textSecondary),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        fillColor: Colors.grey.shade50,
+        hintStyle: textTheme.bodyMedium?.copyWith(
+          color: AppColors.textSecondary,
+        ),
+        labelStyle: textTheme.bodyMedium,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 18,
+        ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide(color: Colors.grey.shade300),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: AppColors.divider, width: 1),
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide(color: Colors.grey.shade300),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(14),
           borderSide: const BorderSide(color: AppColors.primary, width: 2),
         ),
       ),
@@ -67,22 +70,17 @@ class AppTheme {
   }
 
   static ThemeData get darkTheme {
-    return ThemeData(
-      useMaterial3: true,
-      scaffoldBackgroundColor: const Color(0xFF121212),
-      brightness: Brightness.dark,
+    final textTheme = AppTypography.createTextTheme();
+
+    return ThemeData.dark().copyWith(
+      textTheme: textTheme,
       colorScheme: const ColorScheme.dark(
         primary: AppColors.primary,
         secondary: AppColors.secondary,
         surface: Color(0xFF1E1E1E),
         onSurface: Colors.white,
       ),
-      textTheme: GoogleFonts.interTextTheme(ThemeData.dark().textTheme),
-      appBarTheme: const AppBarTheme(
-        backgroundColor: Color(0xFF121212),
-        elevation: 0,
-        centerTitle: true,
-      ),
+      scaffoldBackgroundColor: const Color(0xFF121212),
     );
   }
 }

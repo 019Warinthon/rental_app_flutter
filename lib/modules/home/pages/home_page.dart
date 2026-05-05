@@ -7,20 +7,16 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:shimmer/shimmer.dart';
 import '../providers/home_provider.dart';
 import '../../../core/config/colors.dart';
+import '../../../core/config/typography.dart';
 import '../widgets/room_card.dart';
 import '../widgets/map_rooms_widget.dart';
-import '../../main/providers/favorites_provider.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final favProvider = context.read<FavoritesProvider>();
-    return ChangeNotifierProvider(
-      create: (_) => HomeProvider()..attachFavorites(favProvider),
-      child: const _HomePageContent(),
-    );
+    return const _HomePageContent();
   }
 }
 
@@ -60,6 +56,18 @@ class _HomePageContentState extends State<_HomePageContent> {
               ],
             ),
           ),
+          floatingActionButton: FloatingActionButton.extended(
+            onPressed: () {
+              context.push('/create-property');
+            },
+            backgroundColor: AppColors.primary,
+            foregroundColor: Colors.white,
+            icon: const Icon(LucideIcons.plus),
+            label: const Text(
+              'ลงประกาศ',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ),
         );
       },
     );
@@ -70,8 +78,8 @@ class _HomePageContentState extends State<_HomePageContent> {
     final greeting = now.hour < 12
         ? 'Good Morning'
         : now.hour < 18
-            ? 'Good Afternoon'
-            : 'Good Evening';
+        ? 'Good Afternoon'
+        : 'Good Evening';
 
     return SliverAppBar(
       expandedHeight: 140,
@@ -138,25 +146,25 @@ class _HomePageContentState extends State<_HomePageContent> {
                     children: [
                       Text(
                         '$greeting 👋',
-                        style: TextStyle(
+                        style: AppTypography.fontBodySmall(
                           color: Colors.white.withValues(alpha: 0.7),
-                          fontSize: 14,
                         ),
                       ),
                       const SizedBox(height: 4),
-                      const Text(
+                      Text(
                         'Find your perfect room',
-                        style: TextStyle(
+                        style: AppTypography.fontTitleLargeProminent(
                           color: Colors.white,
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
                         ),
                       ),
                       const SizedBox(height: 4),
                       Row(
                         children: [
-                          const Icon(LucideIcons.mapPin,
-                              size: 13, color: AppColors.accent),
+                          const Icon(
+                            LucideIcons.mapPin,
+                            size: 13,
+                            color: AppColors.accent,
+                          ),
                           const SizedBox(width: 4),
                           Text(
                             'Bangkok, Thailand',
@@ -185,9 +193,7 @@ class _HomePageContentState extends State<_HomePageContent> {
         child: Container(
           margin: const EdgeInsets.fromLTRB(16, 0, 16, 0),
           padding: const EdgeInsets.only(bottom: 16),
-          decoration: const BoxDecoration(
-            color: AppColors.secondary,
-          ),
+          decoration: const BoxDecoration(color: AppColors.secondary),
           child: Row(
             children: [
               Expanded(
@@ -208,13 +214,21 @@ class _HomePageContentState extends State<_HomePageContent> {
                     decoration: InputDecoration(
                       hintText: 'search_hint'.tr(),
                       hintStyle: const TextStyle(
-                          color: AppColors.textSecondary, fontSize: 14),
-                      prefixIcon: const Icon(LucideIcons.search,
-                          color: AppColors.textSecondary, size: 18),
+                        color: AppColors.textSecondary,
+                        fontSize: 14,
+                      ),
+                      prefixIcon: const Icon(
+                        LucideIcons.search,
+                        color: AppColors.textSecondary,
+                        size: 18,
+                      ),
                       suffixIcon: _searchController.text.isNotEmpty
                           ? IconButton(
-                              icon: const Icon(LucideIcons.x,
-                                  color: AppColors.textSecondary, size: 16),
+                              icon: const Icon(
+                                LucideIcons.x,
+                                color: AppColors.textSecondary,
+                                size: 16,
+                              ),
                               onPressed: () {
                                 _searchController.clear();
                                 provider.setFilter('', provider.maxPrice);
@@ -254,8 +268,11 @@ class _HomePageContentState extends State<_HomePageContent> {
                       ),
                     ],
                   ),
-                  child: const Icon(LucideIcons.slidersHorizontal,
-                      color: Colors.white, size: 20),
+                  child: const Icon(
+                    LucideIcons.slidersHorizontal,
+                    color: Colors.white,
+                    size: 20,
+                  ),
                 ),
               ),
             ],
@@ -278,20 +295,13 @@ class _HomePageContentState extends State<_HomePageContent> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     'Categories',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
-                    ),
+                    style: AppTypography.fontTitleMediumProminent(),
                   ),
                   Text(
                     '${provider.rooms.length} rooms',
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: AppColors.textSecondary,
-                    ),
+                    style: AppTypography.fontBodySmall(),
                   ),
                 ],
               ),
@@ -312,11 +322,11 @@ class _HomePageContentState extends State<_HomePageContent> {
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 18, vertical: 8),
+                        horizontal: 18,
+                        vertical: 8,
+                      ),
                       decoration: BoxDecoration(
-                        color: isSelected
-                            ? AppColors.primary
-                            : Colors.white,
+                        color: isSelected ? AppColors.primary : Colors.white,
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
                           color: isSelected
@@ -326,11 +336,12 @@ class _HomePageContentState extends State<_HomePageContent> {
                         boxShadow: isSelected
                             ? [
                                 BoxShadow(
-                                  color:
-                                      AppColors.primary.withValues(alpha: 0.3),
+                                  color: AppColors.primary.withValues(
+                                    alpha: 0.3,
+                                  ),
                                   blurRadius: 8,
                                   offset: const Offset(0, 3),
-                                )
+                                ),
                               ]
                             : [],
                       ),
@@ -359,57 +370,47 @@ class _HomePageContentState extends State<_HomePageContent> {
   Widget _buildContent(BuildContext context, HomeProvider provider) {
     if (provider.isLoading) {
       return SliverList(
-        delegate: SliverChildBuilderDelegate(
-          (context, index) {
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Shimmer.fromColors(
-                baseColor: Colors.grey[300]!,
-                highlightColor: Colors.grey[100]!,
-                child: Container(
-                  height: 140,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
+        delegate: SliverChildBuilderDelegate((context, index) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Shimmer.fromColors(
+              baseColor: Colors.grey[300]!,
+              highlightColor: Colors.grey[100]!,
+              child: Container(
+                height: 140,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
                 ),
               ),
-            );
-          },
-          childCount: 5,
-        ),
+            ),
+          );
+        }, childCount: 5),
       );
     }
 
     if (provider.rooms.isEmpty) {
-      return SliverFillRemaining(
-        child: _buildEmpty(context, provider),
-      );
+      return SliverFillRemaining(child: _buildEmpty(context, provider));
     }
 
     if (provider.isMapView) {
-      return SliverFillRemaining(
-        child: MapRoomsWidget(rooms: provider.rooms),
-      );
+      return SliverFillRemaining(child: MapRoomsWidget(rooms: provider.rooms));
     }
 
     return SliverList(
-      delegate: SliverChildBuilderDelegate(
-        (context, index) {
-          if (index == 0) {
-            return _buildFeaturedBanner(context, provider);
-          }
-          final room = provider.rooms[index - 1];
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: RoomCard(
-              room: room,
-              onTap: () => context.push('/room_detail', extra: room),
-            ),
-          );
-        },
-        childCount: provider.rooms.length + 1,
-      ),
+      delegate: SliverChildBuilderDelegate((context, index) {
+        if (index == 0) {
+          return _buildFeaturedBanner(context, provider);
+        }
+        final room = provider.rooms[index - 1];
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: RoomCard(
+            room: room,
+            onTap: () => context.push('/room_detail', extra: room),
+          ),
+        );
+      }, childCount: provider.rooms.length + 1),
     );
   }
 
@@ -442,9 +443,8 @@ class _HomePageContentState extends State<_HomePageContent> {
               Image.network(
                 featured.imageUrls.isNotEmpty ? featured.imageUrls.first : '',
                 fit: BoxFit.cover,
-                errorBuilder: (ctx, err, _) => Container(
-                  color: AppColors.secondary,
-                ),
+                errorBuilder: (ctx, err, _) =>
+                    Container(color: AppColors.secondary),
               ),
               // Gradient overlay
               Container(
@@ -469,7 +469,9 @@ class _HomePageContentState extends State<_HomePageContent> {
                   children: [
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 4),
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.accent,
                         borderRadius: BorderRadius.circular(20),
@@ -477,8 +479,11 @@ class _HomePageContentState extends State<_HomePageContent> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(LucideIcons.star,
-                              size: 12, color: Colors.white),
+                          const Icon(
+                            LucideIcons.star,
+                            size: 12,
+                            color: Colors.white,
+                          ),
                           const SizedBox(width: 4),
                           const Text(
                             'Top Rated',
@@ -505,8 +510,11 @@ class _HomePageContentState extends State<_HomePageContent> {
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        const Icon(LucideIcons.mapPin,
-                            size: 12, color: Colors.white70),
+                        const Icon(
+                          LucideIcons.mapPin,
+                          size: 12,
+                          color: Colors.white70,
+                        ),
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
@@ -537,7 +545,9 @@ class _HomePageContentState extends State<_HomePageContent> {
                 right: 12,
                 child: Container(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 10, vertical: 5),
+                    horizontal: 10,
+                    vertical: 5,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(20),
@@ -545,8 +555,11 @@ class _HomePageContentState extends State<_HomePageContent> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(LucideIcons.star,
-                          size: 13, color: Colors.amber),
+                      const Icon(
+                        LucideIcons.star,
+                        size: 13,
+                        color: Colors.amber,
+                      ),
                       const SizedBox(width: 3),
                       Text(
                         featured.rating.toStringAsFixed(1),
@@ -579,8 +592,11 @@ class _HomePageContentState extends State<_HomePageContent> {
               color: AppColors.primary.withValues(alpha: 0.08),
               shape: BoxShape.circle,
             ),
-            child: const Icon(LucideIcons.searchX,
-                size: 44, color: AppColors.primary),
+            child: const Icon(
+              LucideIcons.searchX,
+              size: 44,
+              color: AppColors.primary,
+            ),
           ),
           const SizedBox(height: 20),
           const Text(
@@ -609,9 +625,9 @@ class _HomePageContentState extends State<_HomePageContent> {
               foregroundColor: AppColors.primary,
               side: const BorderSide(color: AppColors.primary),
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             ),
           ),
         ],
@@ -622,6 +638,8 @@ class _HomePageContentState extends State<_HomePageContent> {
   void _showAdvancedFilter(BuildContext context, HomeProvider provider) {
     double currentPrice = provider.maxPrice;
     String selectedType = provider.selectedCategory;
+    String selectedLayout = provider.selectedLayout;
+    String selectedProvince = provider.selectedProvince;
 
     showModalBottomSheet(
       context: context,
@@ -633,7 +651,11 @@ class _HomePageContentState extends State<_HomePageContent> {
         builder: (ctx, setModalState) {
           return Padding(
             padding: EdgeInsets.fromLTRB(
-                24, 0, 24, MediaQuery.of(ctx).viewInsets.bottom + 32),
+              24,
+              0,
+              24,
+              MediaQuery.of(ctx).viewInsets.bottom + 32,
+            ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -656,7 +678,9 @@ class _HomePageContentState extends State<_HomePageContent> {
                     const Text(
                       'Filter Rooms',
                       style: TextStyle(
-                          fontSize: 20, fontWeight: FontWeight.bold),
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     TextButton(
                       onPressed: () {
@@ -665,8 +689,10 @@ class _HomePageContentState extends State<_HomePageContent> {
                           selectedType = 'All';
                         });
                       },
-                      child: const Text('Reset',
-                          style: TextStyle(color: AppColors.primary)),
+                      child: const Text(
+                        'Reset',
+                        style: TextStyle(color: AppColors.primary),
+                      ),
                     ),
                   ],
                 ),
@@ -693,13 +719,18 @@ class _HomePageContentState extends State<_HomePageContent> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text('฿1,000',
-                              style: TextStyle(
-                                  color: AppColors.textSecondary,
-                                  fontSize: 13)),
+                          const Text(
+                            '฿1,000',
+                            style: TextStyle(
+                              color: AppColors.textSecondary,
+                              fontSize: 13,
+                            ),
+                          ),
                           Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 14, vertical: 6),
+                              horizontal: 14,
+                              vertical: 6,
+                            ),
                             decoration: BoxDecoration(
                               color: AppColors.primary,
                               borderRadius: BorderRadius.circular(20),
@@ -713,10 +744,13 @@ class _HomePageContentState extends State<_HomePageContent> {
                               ),
                             ),
                           ),
-                          const Text('฿100,000',
-                              style: TextStyle(
-                                  color: AppColors.textSecondary,
-                                  fontSize: 13)),
+                          const Text(
+                            '฿100,000',
+                            style: TextStyle(
+                              color: AppColors.textSecondary,
+                              fontSize: 13,
+                            ),
+                          ),
                         ],
                       ),
                       SliderTheme(
@@ -724,8 +758,9 @@ class _HomePageContentState extends State<_HomePageContent> {
                           activeTrackColor: AppColors.primary,
                           thumbColor: AppColors.primary,
                           inactiveTrackColor: AppColors.divider,
-                          overlayColor:
-                              AppColors.primary.withValues(alpha: 0.2),
+                          overlayColor: AppColors.primary.withValues(
+                            alpha: 0.2,
+                          ),
                         ),
                         child: Slider(
                           value: currentPrice,
@@ -758,16 +793,15 @@ class _HomePageContentState extends State<_HomePageContent> {
                   children: HomeProvider.categories.map((cat) {
                     final isSelected = selectedType == cat;
                     return GestureDetector(
-                      onTap: () =>
-                          setModalState(() => selectedType = cat),
+                      onTap: () => setModalState(() => selectedType = cat),
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 150),
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 18, vertical: 10),
+                          horizontal: 18,
+                          vertical: 10,
+                        ),
                         decoration: BoxDecoration(
-                          color: isSelected
-                              ? AppColors.primary
-                              : Colors.white,
+                          color: isSelected ? AppColors.primary : Colors.white,
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
                             color: isSelected
@@ -790,14 +824,101 @@ class _HomePageContentState extends State<_HomePageContent> {
                   }).toList(),
                 ),
 
+                const SizedBox(height: 20),
+                const Text(
+                  'Room Layout',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: HomeProvider.layouts.map((layout) {
+                    final isSelected = selectedLayout == layout;
+                    return GestureDetector(
+                      onTap: () => setModalState(() => selectedLayout = layout),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 150),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 18,
+                          vertical: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          color: isSelected ? AppColors.primary : Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: isSelected
+                                ? AppColors.primary
+                                : AppColors.divider,
+                          ),
+                        ),
+                        child: Text(
+                          layout,
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: isSelected
+                                ? Colors.white
+                                : AppColors.textSecondary,
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+
+                const SizedBox(height: 20),
+                const Text(
+                  'Province',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                DropdownButtonFormField<String>(
+                  value: selectedProvince,
+                  decoration: InputDecoration(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: const BorderSide(color: AppColors.divider),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: const BorderSide(color: AppColors.divider),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: const BorderSide(color: AppColors.primary),
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
+                  ),
+                  items: HomeProvider.provinces.map((prov) {
+                    return DropdownMenuItem(value: prov, child: Text(prov));
+                  }).toList(),
+                  onChanged: (val) {
+                    if (val != null) setModalState(() => selectedProvince = val);
+                  },
+                ),
+
                 const SizedBox(height: 28),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () {
-                      provider.setFilter(
-                          provider.searchQuery, currentPrice);
-                      provider.setCategory(selectedType);
+                      provider.setFilterAdvanced(
+                        price: currentPrice,
+                        category: selectedType,
+                        layout: selectedLayout,
+                        province: selectedProvince,
+                      );
                       Navigator.pop(ctx);
                     },
                     style: ElevatedButton.styleFrom(
@@ -805,12 +926,17 @@ class _HomePageContentState extends State<_HomePageContent> {
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14)),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
                       elevation: 0,
                     ),
-                    child: const Text('Apply Filters',
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.w600)),
+                    child: const Text(
+                      'Apply Filters',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
                 ),
               ],

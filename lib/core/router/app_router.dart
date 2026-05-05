@@ -1,15 +1,17 @@
 import 'package:go_router/go_router.dart';
-import '../../modules/auth/pages/login_page.dart';
-import '../../modules/auth/pages/register_page.dart';
-import '../../modules/main/pages/main_page.dart';
-import '../../modules/room_detail/pages/room_detail_page.dart';
-import '../../modules/booking/pages/booking_page.dart';
-import '../../modules/onboarding/pages/onboarding_page.dart';
-import '../../modules/onboarding/pages/splash_page.dart';
-import '../../modules/home/models/room_model.dart';
+import 'package:rental_app/modules/auth/pages/login_page.dart';
+import 'package:rental_app/modules/auth/pages/register_page.dart';
+import 'package:rental_app/modules/main/pages/main_page.dart';
+import 'package:rental_app/modules/room_detail/pages/room_detail_page.dart';
+import 'package:rental_app/modules/booking/pages/booking_page.dart';
+import 'package:rental_app/modules/onboarding/pages/onboarding_page.dart';
+import 'package:rental_app/modules/onboarding/pages/splash_page.dart';
+import 'package:rental_app/modules/home/models/room_model.dart';
 
-import '../../modules/chat/pages/chat_page.dart';
-import '../../modules/booking/pages/my_bookings_page.dart';
+import 'package:rental_app/modules/chat/pages/chat_page.dart';
+import 'package:rental_app/modules/booking/pages/my_bookings_page.dart';
+import 'package:rental_app/modules/home/pages/create_property_page.dart';
+import 'package:rental_app/modules/home/pages/edit_property_page.dart';
 
 class AppRouter {
   static final router = GoRouter(
@@ -36,6 +38,17 @@ class AppRouter {
         builder: (context, state) => const MainPage(),
       ),
       GoRoute(
+        path: '/create-property',
+        builder: (context, state) => const CreatePropertyPage(),
+      ),
+      GoRoute(
+        path: '/edit-property',
+        builder: (context, state) {
+          final room = state.extra as RoomModel;
+          return EditPropertyPage(room: room);
+        },
+      ),
+      GoRoute(
         path: '/room_detail',
         builder: (context, state) {
           final room = state.extra as RoomModel;
@@ -51,12 +64,7 @@ class AppRouter {
       ),
       GoRoute(
         path: '/chat',
-        builder: (context, state) {
-          final extra = state.extra as Map<String, dynamic>? ?? {};
-          final landlordName = extra['landlordName'] as String? ?? 'Landlord';
-          final roomTitle = extra['roomTitle'] as String? ?? 'Room Inquiry';
-          return ChatPage(landlordName: landlordName, roomTitle: roomTitle);
-        },
+        builder: (context, state) => const ChatPage(),
       ),
       GoRoute(
         path: '/my-bookings',

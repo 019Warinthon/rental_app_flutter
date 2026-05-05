@@ -360,15 +360,25 @@ class _RegisterPageState extends State<RegisterPage>
                                                     .loadProfile();
                                                 context.go('/home');
                                               } else if (context.mounted) {
-                                                ScaffoldMessenger.of(context).clearSnackBars();
-                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                ScaffoldMessenger.of(
+                                                  context,
+                                                ).clearSnackBars();
+                                                ScaffoldMessenger.of(
+                                                  context,
+                                                ).showSnackBar(
                                                   SnackBar(
                                                     content: const Text(
                                                       'Registration failed. Try again.',
-                                                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                      ),
                                                     ),
-                                                    backgroundColor: Colors.redAccent,
-                                                    behavior: SnackBarBehavior.floating,
+                                                    backgroundColor:
+                                                        Colors.redAccent,
+                                                    behavior: SnackBarBehavior
+                                                        .floating,
                                                   ),
                                                 );
                                               }
@@ -476,7 +486,16 @@ class _RegisterPageState extends State<RegisterPage>
           children: [
             Expanded(
               child: OutlinedButton.icon(
-                onPressed: () {},
+                onPressed: () async {
+                  final success = await context
+                      .read<AuthProvider>()
+                      .loginWithGoogle();
+                  if (!mounted) return;
+                  if (success) {
+                    context.read<UserProvider>().loadProfile();
+                    context.go('/home');
+                  }
+                },
                 icon: const Icon(
                   Icons.g_mobiledata,
                   size: 24,

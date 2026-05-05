@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:intl/intl.dart';
+import '../providers/chat_provider.dart';
+import '../../profile/providers/user_provider.dart';
 import '../../../core/config/colors.dart';
 
 class ChatPage extends StatefulWidget {
-  final String landlordName;
-  final String roomTitle;
-
-  const ChatPage({
-    super.key,
-    required this.landlordName,
-    required this.roomTitle,
-  });
+  const ChatPage({super.key});
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -18,51 +15,63 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> {
   final TextEditingController _messageController = TextEditingController();
-  final List<Map<String, dynamic>> _messages = [
-    {
-      'text': 'Hello! Is this room still available?',
-      'isMe': true,
-      'time': '10:30 AM',
-    },
-    {
-      'text': 'Hi! Yes, it is still available. When would you like to visit?',
-      'isMe': false,
-      'time': '10:32 AM',
-    }
-  ];
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _messageController.dispose();
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   void _sendMessage() {
     final text = _messageController.text.trim();
     if (text.isEmpty) return;
-    setState(() {
-      _messages.add({
-        'text': text,
-        'isMe': true,
-        'time': 'Just now',
-      });
-      _messageController.clear();
-    });
-
-    // Simple echo back after a short delay
-    Future.delayed(const Duration(seconds: 1), () {
-      if (mounted) {
-        setState(() {
-          _messages.add({
-            'text': 'Great! Let me know if you have any questions.',
-            'isMe': false,
-            'time': 'Just now',
-          });
-        });
+    
+    context.read<ChatProvider>().sendMessage(text);
+    _messageController.clear();
+    
+    // Scroll to bottom
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
       }
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final chatProvider = context.watch<ChatProvider>();
+    final userProvider = context.read<UserProvider>();
+    final currentChat = chatProvider.currentChat;
+    final messages = chatProvider.currentMessages;
+    final myId = userProvider.user.id;
+
+    if (currentChat == null) {
+      return const Scaffold(
+        body: Center(child: Text('No active chat')),
+      );
+    }
+
+    // Determine the "other person" name (if I'm user, it's owner. if I'm owner, it's user)
+    final isOwner = myId == currentChat.ownerId;
+    final otherName = isOwner ? currentChat.userName : currentChat.ownerName;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         titleSpacing: 0,
+        leading: IconButton(
+          icon: const Icon(LucideIcons.chevronLeft),
+          onPressed: () {
+            chatProvider.leaveChat();
+            Navigator.pop(context);
+          },
+        ),
         title: Row(
           children: [
             CircleAvatar(
@@ -75,7 +84,7 @@ class _ChatPageState extends State<ChatPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    widget.landlordName,
+                    otherName,
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -83,7 +92,7 @@ class _ChatPageState extends State<ChatPage> {
                     ),
                   ),
                   Text(
-                    widget.roomTitle,
+                    currentChat.propertyTitle,
                     style: const TextStyle(
                       fontSize: 12,
                       color: AppColors.textSecondary,
@@ -101,53 +110,63 @@ class _ChatPageState extends State<ChatPage> {
       body: Column(
         children: [
           Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: _messages.length,
-              itemBuilder: (context, index) {
-                final msg = _messages[index];
-                final isMe = msg['isMe'] as bool;
-                return Align(
-                  alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
-                  child: Container(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                    constraints: BoxConstraints(
-                      maxWidth: MediaQuery.of(context).size.width * 0.75,
-                    ),
-                    decoration: BoxDecoration(
-                      color: isMe ? AppColors.primary : AppColors.surface,
-                      borderRadius: BorderRadius.only(
-                        topLeft: const Radius.circular(16),
-                        topRight: const Radius.circular(16),
-                        bottomLeft: isMe ? const Radius.circular(16) : Radius.zero,
-                        bottomRight: isMe ? Radius.zero : const Radius.circular(16),
+            child: chatProvider.isLoading 
+              ? const Center(child: CircularProgressIndicator())
+              : ListView.builder(
+                  controller: _scrollController,
+                  padding: const EdgeInsets.all(16),
+                  itemCount: messages.length,
+                  itemBuilder: (context, index) {
+                    final msg = messages[index];
+                    final isMe = msg.senderId == myId;
+                    
+                    String timeStr = '...';
+                    try {
+                      final date = DateTime.parse(msg.createdAt).toLocal();
+                      timeStr = DateFormat('HH:mm').format(date);
+                    } catch(_) {}
+
+                    return Align(
+                      alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+                      child: Container(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                        constraints: BoxConstraints(
+                          maxWidth: MediaQuery.of(context).size.width * 0.75,
+                        ),
+                        decoration: BoxDecoration(
+                          color: isMe ? AppColors.primary : AppColors.surface,
+                          borderRadius: BorderRadius.only(
+                            topLeft: const Radius.circular(16),
+                            topRight: const Radius.circular(16),
+                            bottomLeft: isMe ? const Radius.circular(16) : Radius.zero,
+                            bottomRight: isMe ? Radius.zero : const Radius.circular(16),
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              msg.text,
+                              style: TextStyle(
+                                color: isMe ? Colors.white : AppColors.textPrimary,
+                                fontSize: 14,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              timeStr,
+                              style: TextStyle(
+                                color: isMe ? Colors.white70 : AppColors.textSecondary,
+                                fontSize: 10,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          msg['text'],
-                          style: TextStyle(
-                            color: isMe ? Colors.white : AppColors.textPrimary,
-                            fontSize: 14,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          msg['time'],
-                          style: TextStyle(
-                            color: isMe ? Colors.white70 : AppColors.textSecondary,
-                            fontSize: 10,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
+                    );
+                  },
+                ),
           ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -161,34 +180,36 @@ class _ChatPageState extends State<ChatPage> {
                 ),
               ],
             ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: AppColors.surface,
-                      borderRadius: BorderRadius.circular(24),
-                    ),
-                    child: TextField(
-                      controller: _messageController,
-                      decoration: const InputDecoration(
-                        hintText: 'Type a message...',
-                        hintStyle: TextStyle(color: AppColors.textSecondary, fontSize: 14),
-                        border: InputBorder.none,
-                        enabledBorder: InputBorder.none,
-                        focusedBorder: InputBorder.none,
-                        contentPadding: EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+            child: SafeArea(
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.surface,
+                        borderRadius: BorderRadius.circular(24),
                       ),
-                      onSubmitted: (_) => _sendMessage(),
+                      child: TextField(
+                        controller: _messageController,
+                        decoration: const InputDecoration(
+                          hintText: 'Type a message...',
+                          hintStyle: TextStyle(color: AppColors.textSecondary, fontSize: 14),
+                          border: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          contentPadding: EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                        ),
+                        onSubmitted: (_) => _sendMessage(),
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                IconButton(
-                  onPressed: _sendMessage,
-                  icon: const Icon(LucideIcons.send, color: AppColors.primary),
-                ),
-              ],
+                  const SizedBox(width: 8),
+                  IconButton(
+                    onPressed: _sendMessage,
+                    icon: const Icon(LucideIcons.send, color: AppColors.primary),
+                  ),
+                ],
+              ),
             ),
           ),
         ],

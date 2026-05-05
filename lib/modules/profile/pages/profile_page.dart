@@ -4,11 +4,10 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../../core/config/colors.dart';
-import '../../../core/storage/secure_storage.dart';
 import '../providers/user_provider.dart';
 import '../providers/settings_provider.dart';
 import '../../booking/providers/booking_provider.dart';
-
+import '../../auth/providers/auth_provider.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -32,8 +31,11 @@ class ProfilePage extends StatelessWidget {
                 ),
                 actions: [
                   IconButton(
-                    icon: const Icon(LucideIcons.settings,
-                        color: Colors.white, size: 22),
+                    icon: const Icon(
+                      LucideIcons.settings,
+                      color: Colors.white,
+                      size: 22,
+                    ),
                     onPressed: () => _showSettingsSheet(context),
                   ),
                 ],
@@ -73,7 +75,8 @@ class ProfilePage extends StatelessWidget {
                             icon: LucideIcons.userCircle2,
                             label: 'Edit Profile',
                             subtitle: 'Update your personal info',
-                            onTap: () => _showEditProfileSheet(context, userProvider),
+                            onTap: () =>
+                                _showEditProfileSheet(context, userProvider),
                           ),
                           _MenuItem(
                             icon: LucideIcons.calendarCheck,
@@ -132,7 +135,10 @@ class ProfilePage extends StatelessWidget {
   }
 
   Widget _buildProfileHeader(
-      BuildContext context, dynamic user, UserProvider provider) {
+    BuildContext context,
+    dynamic user,
+    UserProvider provider,
+  ) {
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -158,20 +164,25 @@ class ProfilePage extends StatelessWidget {
                       shape: BoxShape.circle,
                       color: AppColors.primary.withValues(alpha: 0.2),
                       border: Border.all(
-                          color: AppColors.primary.withValues(alpha: 0.5),
-                          width: 2),
+                        color: AppColors.primary.withValues(alpha: 0.5),
+                        width: 2,
+                      ),
                     ),
                     child: Center(
-                      child: provider.isLoggedIn 
-                        ? Text(
-                            user.name.substring(0, 1),
-                            style: const TextStyle(
-                              fontSize: 36,
-                              fontWeight: FontWeight.bold,
+                      child: provider.isLoggedIn
+                          ? Text(
+                              user.name.substring(0, 1),
+                              style: const TextStyle(
+                                fontSize: 36,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.primary,
+                              ),
+                            )
+                          : const Icon(
+                              LucideIcons.user,
+                              size: 40,
                               color: AppColors.primary,
                             ),
-                          )
-                        : const Icon(LucideIcons.user, size: 40, color: AppColors.primary),
                     ),
                   ),
                   if (provider.isLoggedIn)
@@ -180,10 +191,16 @@ class ProfilePage extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: AppColors.accent,
                         shape: BoxShape.circle,
-                        border: Border.all(color: AppColors.secondary, width: 2),
+                        border: Border.all(
+                          color: AppColors.secondary,
+                          width: 2,
+                        ),
                       ),
-                      child: const Icon(LucideIcons.edit2,
-                          size: 14, color: Colors.white),
+                      child: const Icon(
+                        LucideIcons.edit2,
+                        size: 14,
+                        color: Colors.white,
+                      ),
                     ),
                 ],
               ),
@@ -212,7 +229,6 @@ class ProfilePage extends StatelessWidget {
       ),
     );
   }
-
 
   Widget _buildStatsRow(BuildContext context, BookingProvider bookingProvider) {
     final confirmed = bookingProvider.bookings
@@ -306,8 +322,10 @@ class ProfilePage extends StatelessWidget {
           return Column(
             children: [
               ListTile(
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 4,
+                ),
                 leading: Container(
                   padding: const EdgeInsets.all(9),
                   decoration: BoxDecoration(
@@ -333,13 +351,20 @@ class ProfilePage extends StatelessWidget {
                         ),
                       )
                     : null,
-                trailing: const Icon(LucideIcons.chevronRight,
-                    size: 18, color: AppColors.textSecondary),
+                trailing: const Icon(
+                  LucideIcons.chevronRight,
+                  size: 18,
+                  color: AppColors.textSecondary,
+                ),
                 onTap: item.onTap,
               ),
               if (i < items.length - 1)
                 const Divider(
-                    height: 1, indent: 56, endIndent: 16, thickness: 0.5),
+                  height: 1,
+                  indent: 56,
+                  endIndent: 16,
+                  thickness: 0.5,
+                ),
             ],
           );
         }).toList(),
@@ -356,9 +381,12 @@ class ProfilePage extends StatelessWidget {
             context: context,
             builder: (ctx) => AlertDialog(
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16)),
-              title: const Text('Logout',
-                  style: TextStyle(fontWeight: FontWeight.bold)),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              title: const Text(
+                'Logout',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
               content: const Text('Are you sure you want to logout?'),
               actions: [
                 TextButton(
@@ -368,14 +396,20 @@ class ProfilePage extends StatelessWidget {
                 ElevatedButton(
                   onPressed: () async {
                     Navigator.pop(ctx);
-                    await SecureStorage().deleteToken();
-                    if (context.mounted) context.go('/login');
+                    // 1. Clear Auth state & storage
+                    await context.read<AuthProvider>().logout();
+                    // 2. Clear User data in memory
+                    if (context.mounted) {
+                      context.read<UserProvider>().clearProfile();
+                      context.go('/login');
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.error,
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
                   child: const Text('Logout'),
                 ),
@@ -384,14 +418,16 @@ class ProfilePage extends StatelessWidget {
           );
         },
         icon: const Icon(LucideIcons.logOut, color: AppColors.error, size: 18),
-        label: const Text('Logout',
-            style: TextStyle(
-                color: AppColors.error, fontWeight: FontWeight.w600)),
+        label: const Text(
+          'Logout',
+          style: TextStyle(color: AppColors.error, fontWeight: FontWeight.w600),
+        ),
         style: OutlinedButton.styleFrom(
           side: const BorderSide(color: AppColors.error),
           padding: const EdgeInsets.symmetric(vertical: 14),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
         ),
       ),
     );
@@ -401,7 +437,8 @@ class ProfilePage extends StatelessWidget {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
       builder: (ctx) => Consumer<SettingsProvider>(
         builder: (ctx, settings, _) => Padding(
           padding: const EdgeInsets.all(24),
@@ -420,9 +457,10 @@ class ProfilePage extends StatelessWidget {
                   ),
                 ),
               ),
-              const Text('Settings',
-                  style:
-                      TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              const Text(
+                'Settings',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
               const SizedBox(height: 16),
               SwitchListTile(
                 title: const Text('Push Notifications'),
@@ -448,8 +486,13 @@ class ProfilePage extends StatelessWidget {
               const Divider(),
               ListTile(
                 title: const Text('Language'),
-                subtitle: Text(context.locale.languageCode == 'th' ? 'ภาษาไทย' : 'English'),
-                trailing: const Icon(LucideIcons.languages, color: AppColors.primary),
+                subtitle: Text(
+                  context.locale.languageCode == 'th' ? 'ภาษาไทย' : 'English',
+                ),
+                trailing: const Icon(
+                  LucideIcons.languages,
+                  color: AppColors.primary,
+                ),
                 onTap: () {
                   if (context.locale.languageCode == 'en') {
                     context.setLocale(const Locale('th'));
@@ -477,11 +520,16 @@ class ProfilePage extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
       builder: (ctx) {
         return Padding(
           padding: EdgeInsets.fromLTRB(
-              24, 24, 24, MediaQuery.of(ctx).viewInsets.bottom + 24),
+            24,
+            24,
+            24,
+            MediaQuery.of(ctx).viewInsets.bottom + 24,
+          ),
           child: Form(
             key: formKey,
             child: Column(
@@ -500,74 +548,87 @@ class ProfilePage extends StatelessWidget {
                     ),
                   ),
                 ),
-                const Text('Edit Profile',
-                    style: TextStyle(
-                        fontSize: 20, fontWeight: FontWeight.bold)),
+                const Text(
+                  'Edit Profile',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
                 const SizedBox(height: 20),
                 _buildFormField(
-                    controller: nameController,
-                    label: 'Full Name',
-                    icon: LucideIcons.user,
-                    validator: (v) =>
-                        v!.trim().isEmpty ? 'Name is required' : null),
+                  controller: nameController,
+                  label: 'Full Name',
+                  icon: LucideIcons.user,
+                  validator: (v) =>
+                      v!.trim().isEmpty ? 'Name is required' : null,
+                ),
                 const SizedBox(height: 14),
                 _buildFormField(
-                    controller: emailController,
-                    label: 'Email',
-                    icon: LucideIcons.mail,
-                    keyboardType: TextInputType.emailAddress,
-                    validator: (v) =>
-                        v!.contains('@') ? null : 'Enter a valid email'),
+                  controller: emailController,
+                  label: 'Email',
+                  icon: LucideIcons.mail,
+                  keyboardType: TextInputType.emailAddress,
+                  validator: (v) =>
+                      v!.contains('@') ? null : 'Enter a valid email',
+                ),
                 const SizedBox(height: 14),
                 _buildFormField(
-                    controller: phoneController,
-                    label: 'Phone Number',
-                    icon: LucideIcons.phone,
-                    keyboardType: TextInputType.phone),
+                  controller: phoneController,
+                  label: 'Phone Number',
+                  icon: LucideIcons.phone,
+                  keyboardType: TextInputType.phone,
+                ),
                 const SizedBox(height: 24),
-                StatefulBuilder(builder: (ctx2, setState) {
-                  return SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: provider.isSaving
-                          ? null
-                          : () async {
-                              if (!formKey.currentState!.validate()) return;
-                              final success = await provider.updateProfile(
-                                name: nameController.text.trim(),
-                                email: emailController.text.trim(),
-                                phone: phoneController.text.trim(),
-                              );
-                              if (success && ctx.mounted) {
-                                Navigator.pop(ctx);
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Profile updated!'),
-                                    backgroundColor: Colors.green,
-                                  ),
+                StatefulBuilder(
+                  builder: (ctx2, setState) {
+                    return SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: provider.isSaving
+                            ? null
+                            : () async {
+                                if (!formKey.currentState!.validate()) return;
+                                final success = await provider.updateProfile(
+                                  name: nameController.text.trim(),
+                                  email: emailController.text.trim(),
+                                  phone: phoneController.text.trim(),
                                 );
-                              }
-                            },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14)),
+                                if (success && ctx.mounted) {
+                                  Navigator.pop(ctx);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('Profile updated!'),
+                                      backgroundColor: Colors.green,
+                                    ),
+                                  );
+                                }
+                              },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                        child: provider.isSaving
+                            ? const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const Text(
+                                'Save Changes',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
                       ),
-                      child: provider.isSaving
-                          ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(
-                                  color: Colors.white, strokeWidth: 2),
-                            )
-                          : const Text('Save Changes',
-                              style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.w600)),
-                    ),
-                  );
-                }),
+                    );
+                  },
+                ),
               ],
             ),
           ),

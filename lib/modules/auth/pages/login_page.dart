@@ -48,335 +48,338 @@ class _LoginPageState extends State<LoginPage>
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => AuthProvider(),
-      child: Scaffold(
-        body: Stack(
-          children: [
-            // Gradient background
-            Container(
-              height: MediaQuery.of(context).size.height * 0.42,
+    return Scaffold(
+      body: Stack(
+        children: [
+          // Gradient background
+          Container(
+            height: MediaQuery.of(context).size.height * 0.42,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [AppColors.secondary, Color(0xFF3D3F5A)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+            child: Stack(
+              children: [
+                Positioned(
+                  right: -50,
+                  top: -50,
+                  child: Container(
+                    width: 220,
+                    height: 220,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white.withValues(alpha: 0.05),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  left: -30,
+                  bottom: 40,
+                  child: Container(
+                    width: 140,
+                    height: 140,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: AppColors.primary.withValues(alpha: 0.15),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // White card
+          Positioned(
+            top: MediaQuery.of(context).size.height * 0.35,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: Container(
               decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [AppColors.secondary, Color(0xFF3D3F5A)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-              ),
-              child: Stack(
-                children: [
-                  Positioned(
-                    right: -50,
-                    top: -50,
-                    child: Container(
-                      width: 220,
-                      height: 220,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.white.withValues(alpha: 0.05),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    left: -30,
-                    bottom: 40,
-                    child: Container(
-                      width: 140,
-                      height: 140,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: AppColors.primary.withValues(alpha: 0.15),
-                      ),
-                    ),
-                  ),
-                ],
+                color: AppColors.background,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
               ),
             ),
+          ),
 
-            // White card
-            Positioned(
-              top: MediaQuery.of(context).size.height * 0.35,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: AppColors.background,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
-                ),
-              ),
-            ),
-
-            // Content
-            SafeArea(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 28),
-                child: FadeTransition(
-                  opacity: _fadeAnim,
-                  child: SlideTransition(
-                    position: _slideAnim,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 32),
-                        // Logo area
-                        Center(
-                          child: Container(
-                            width: 72,
-                            height: 72,
-                            decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                colors: [AppColors.primary, Color(0xFF8B85FF)],
-                              ),
-                              borderRadius: BorderRadius.circular(20),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: AppColors.primary.withValues(
-                                    alpha: 0.4,
-                                  ),
-                                  blurRadius: 20,
-                                  offset: const Offset(0, 8),
-                                ),
-                              ],
-                            ),
-                            child: const Icon(
-                              LucideIcons.building2,
-                              size: 36,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        const Center(
-                          child: Text(
-                            'RentSpace',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Center(
-                          child: Text(
-                            'Your perfect room awaits',
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.65),
-                              fontSize: 13,
-                            ),
-                          ),
-                        ),
-
-                        const SizedBox(height: 44),
-
-                        // Card form
-                        Container(
-                          padding: const EdgeInsets.all(24),
+          // Content
+          SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 28),
+              child: FadeTransition(
+                opacity: _fadeAnim,
+                child: SlideTransition(
+                  position: _slideAnim,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 32),
+                      // Logo area
+                      Center(
+                        child: Container(
+                          width: 72,
+                          height: 72,
                           decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(24),
+                            gradient: const LinearGradient(
+                              colors: [AppColors.primary, Color(0xFF8B85FF)],
+                            ),
+                            borderRadius: BorderRadius.circular(20),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.08),
-                                blurRadius: 24,
+                                color: AppColors.primary.withValues(alpha: 0.4),
+                                blurRadius: 20,
                                 offset: const Offset(0, 8),
                               ),
                             ],
                           ),
-                          child: Consumer<AuthProvider>(
-                            builder: (context, provider, _) {
-                              return Form(
-                                key: _formKey,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text(
-                                      'Welcome back 👋',
-                                      style: TextStyle(
-                                        fontSize: 22,
-                                        fontWeight: FontWeight.bold,
-                                        color: AppColors.textPrimary,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    const Text(
-                                      'Sign in to continue',
-                                      style: TextStyle(
-                                        color: AppColors.textSecondary,
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 24),
-
-                                    // Email field
-                                    _buildField(
-                                      controller: _emailController,
-                                      label: 'Email address',
-                                      icon: LucideIcons.mail,
-                                      keyboardType: TextInputType.emailAddress,
-                                      validator: (v) => v!.contains('@')
-                                          ? null
-                                          : 'Enter a valid email',
-                                    ),
-                                    const SizedBox(height: 16),
-
-                                    // Password field
-                                    _buildField(
-                                      controller: _passwordController,
-                                      label: 'Password',
-                                      icon: LucideIcons.lock,
-                                      obscure: _obscurePassword,
-                                      suffixIcon: IconButton(
-                                        icon: Icon(
-                                          _obscurePassword
-                                              ? LucideIcons.eyeOff
-                                              : LucideIcons.eye,
-                                          size: 18,
-                                          color: AppColors.textSecondary,
-                                        ),
-                                        onPressed: () => setState(
-                                          () => _obscurePassword =
-                                              !_obscurePassword,
-                                        ),
-                                      ),
-                                      validator: (v) => v!.length >= 6
-                                          ? null
-                                          : 'Min 6 characters',
-                                    ),
-
-                                    // Forgot password
-                                    Align(
-                                      alignment: Alignment.centerRight,
-                                      child: TextButton(
-                                        onPressed: () {},
-                                        child: const Text(
-                                          'Forgot password?',
-                                          style: TextStyle(
-                                            color: AppColors.primary,
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-
-                                    const SizedBox(height: 8),
-
-                                    // Login button
-                                    SizedBox(
-                                      width: double.infinity,
-                                      child: ElevatedButton(
-                                        onPressed: provider.isLoading
-                                            ? null
-                                            : () async {
-                                                if (!_formKey.currentState!
-                                                    .validate()) {
-                                                  return;
-                                                }
-                                                final success = await provider
-                                                    .login(
-                                                      _emailController.text
-                                                          .trim(),
-                                                      _passwordController.text,
-                                                    );
-                                                if (success &&
-                                                    context.mounted) {
-                                                  context
-                                                      .read<UserProvider>()
-                                                      .loadProfile();
-                                                  context.go('/home');
-                                                } else if (context.mounted) {
-                                                  ScaffoldMessenger.of(context).clearSnackBars();
-                                                  ScaffoldMessenger.of(context).showSnackBar(
-                                                    SnackBar(
-                                                      content: const Text(
-                                                        'Invalid email or password',
-                                                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
-                                                      ),
-                                                      backgroundColor: Colors.redAccent,
-                                                      behavior: SnackBarBehavior.floating,
-                                                    ),
-                                                  );
-                                                }
-                                              },
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: AppColors.primary,
-                                          foregroundColor: Colors.white,
-                                          disabledBackgroundColor:
-                                              AppColors.divider,
-                                          padding: const EdgeInsets.symmetric(
-                                            vertical: 16,
-                                          ),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              14,
-                                            ),
-                                          ),
-                                          elevation: 0,
-                                        ),
-                                        child: provider.isLoading
-                                            ? const SizedBox(
-                                                height: 20,
-                                                width: 20,
-                                                child:
-                                                    CircularProgressIndicator(
-                                                      color: Colors.white,
-                                                      strokeWidth: 2,
-                                                    ),
-                                              )
-                                            : const Text(
-                                                'Sign In',
-                                                style: TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.w600,
-                                                ),
-                                              ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
+                          child: const Icon(
+                            LucideIcons.building2,
+                            size: 36,
+                            color: Colors.white,
                           ),
                         ),
+                      ),
+                      const SizedBox(height: 16),
+                      const Center(
+                        child: Text(
+                          'RentSpace',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Center(
+                        child: Text(
+                          'Your perfect room awaits',
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.65),
+                            fontSize: 13,
+                          ),
+                        ),
+                      ),
 
-                        const SizedBox(height: 28),
-                        _buildSocialLogins(),
-                        const SizedBox(height: 28),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Text(
-                              "Don't have an account?",
-                              style: TextStyle(
-                                color: AppColors.textSecondary,
-                                fontSize: 14,
-                              ),
-                            ),
-                            TextButton(
-                              onPressed: () => context.push('/register'),
-                              child: const Text(
-                                'Sign Up',
-                                style: TextStyle(
-                                  color: AppColors.primary,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                ),
-                              ),
+                      const SizedBox(height: 44),
+
+                      // Card form
+                      Container(
+                        padding: const EdgeInsets.all(24),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(24),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.08),
+                              blurRadius: 24,
+                              offset: const Offset(0, 8),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 16),
-                      ],
-                    ),
+                        child: Consumer<AuthProvider>(
+                          builder: (context, provider, _) {
+                            return Form(
+                              key: _formKey,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'Welcome back 👋',
+                                    style: TextStyle(
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.textPrimary,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  const Text(
+                                    'Sign in to continue',
+                                    style: TextStyle(
+                                      color: AppColors.textSecondary,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 24),
+
+                                  // Email field
+                                  _buildField(
+                                    controller: _emailController,
+                                    label: 'Email address',
+                                    icon: LucideIcons.mail,
+                                    keyboardType: TextInputType.emailAddress,
+                                    validator: (v) => v!.contains('@')
+                                        ? null
+                                        : 'Enter a valid email',
+                                  ),
+                                  const SizedBox(height: 16),
+
+                                  // Password field
+                                  _buildField(
+                                    controller: _passwordController,
+                                    label: 'Password',
+                                    icon: LucideIcons.lock,
+                                    obscure: _obscurePassword,
+                                    suffixIcon: IconButton(
+                                      icon: Icon(
+                                        _obscurePassword
+                                            ? LucideIcons.eyeOff
+                                            : LucideIcons.eye,
+                                        size: 18,
+                                        color: AppColors.textSecondary,
+                                      ),
+                                      onPressed: () => setState(
+                                        () => _obscurePassword =
+                                            !_obscurePassword,
+                                      ),
+                                    ),
+                                    validator: (v) => v!.length >= 6
+                                        ? null
+                                        : 'Min 6 characters',
+                                  ),
+
+                                  // Forgot password
+                                  Align(
+                                    alignment: Alignment.centerRight,
+                                    child: TextButton(
+                                      onPressed: () {},
+                                      child: const Text(
+                                        'Forgot password?',
+                                        style: TextStyle(
+                                          color: AppColors.primary,
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+
+                                  const SizedBox(height: 8),
+
+                                  // Login button
+                                  SizedBox(
+                                    width: double.infinity,
+                                    child: ElevatedButton(
+                                      onPressed: provider.isLoading
+                                          ? null
+                                          : () async {
+                                              if (!_formKey.currentState!
+                                                  .validate()) {
+                                                return;
+                                              }
+                                              final success = await provider
+                                                  .login(
+                                                    _emailController.text
+                                                        .trim(),
+                                                    _passwordController.text,
+                                                  );
+                                              if (success && context.mounted) {
+                                                context
+                                                    .read<UserProvider>()
+                                                    .loadProfile();
+                                                context.go('/home');
+                                              } else if (context.mounted) {
+                                                ScaffoldMessenger.of(
+                                                  context,
+                                                ).clearSnackBars();
+                                                ScaffoldMessenger.of(
+                                                  context,
+                                                ).showSnackBar(
+                                                  SnackBar(
+                                                    content: const Text(
+                                                      'Invalid email or password',
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                      ),
+                                                    ),
+                                                    backgroundColor:
+                                                        Colors.redAccent,
+                                                    behavior: SnackBarBehavior
+                                                        .floating,
+                                                  ),
+                                                );
+                                              }
+                                            },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: AppColors.primary,
+                                        foregroundColor: Colors.white,
+                                        disabledBackgroundColor:
+                                            AppColors.divider,
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 16,
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            14,
+                                          ),
+                                        ),
+                                        elevation: 0,
+                                      ),
+                                      child: provider.isLoading
+                                          ? const SizedBox(
+                                              height: 20,
+                                              width: 20,
+                                              child: CircularProgressIndicator(
+                                                color: Colors.white,
+                                                strokeWidth: 2,
+                                              ),
+                                            )
+                                          : const Text(
+                                              'Sign In',
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+
+                      const SizedBox(height: 28),
+                      _buildSocialLogins(),
+                      const SizedBox(height: 28),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text(
+                            "Don't have an account?",
+                            style: TextStyle(
+                              color: AppColors.textSecondary,
+                              fontSize: 14,
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () => context.push('/register'),
+                            child: const Text(
+                              'Sign Up',
+                              style: TextStyle(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                    ],
                   ),
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -406,7 +409,16 @@ class _LoginPageState extends State<LoginPage>
           children: [
             Expanded(
               child: OutlinedButton.icon(
-                onPressed: () {},
+                onPressed: () async {
+                  final success = await context
+                      .read<AuthProvider>()
+                      .loginWithGoogle();
+                  if (!mounted) return;
+                  if (success) {
+                    context.read<UserProvider>().loadProfile();
+                    context.go('/home');
+                  }
+                },
                 icon: const Icon(
                   Icons.g_mobiledata,
                   size: 24,

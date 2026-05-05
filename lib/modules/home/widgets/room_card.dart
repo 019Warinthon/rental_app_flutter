@@ -5,6 +5,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../models/room_model.dart';
 import '../../../core/config/colors.dart';
 import '../../main/providers/favorites_provider.dart';
+import '../../profile/providers/user_provider.dart';
 
 class RoomCard extends StatelessWidget {
   final RoomModel room;
@@ -63,8 +64,16 @@ class RoomCard extends StatelessWidget {
                       final isFav = provider.isFavorite(room.id);
                       return GestureDetector(
                         onTap: () {
+                          final userProvider = context.read<UserProvider>();
+                          if (!userProvider.isLoggedIn) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('กรุณาเข้าสู่ระบบเพื่อบันทึกห้องโปรด')),
+                            );
+                            return;
+                          }
+
                           final wasFav = provider.isFavorite(room.id);
-                          provider.toggleFavorite(room);
+                          provider.toggleFavorite(room, userProvider.user.id);
                           ScaffoldMessenger.of(context).clearSnackBars();
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(

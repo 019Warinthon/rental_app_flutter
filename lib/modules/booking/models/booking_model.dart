@@ -35,4 +35,31 @@ class BookingModel {
         return 'Completed';
     }
   }
+
+  factory BookingModel.fromJson(Map<String, dynamic> json) {
+    return BookingModel(
+      id: json['id'] as String,
+      room: RoomModel.fromJson(json['room'] as Map<String, dynamic>),
+      checkIn: DateTime.parse(json['checkIn'] as String),
+      checkOut: DateTime.parse(json['checkOut'] as String),
+      totalPrice: (json['totalPrice'] as num).toDouble(),
+      status: _parseStatus(json['status'] as String? ?? 'confirmed'),
+      createdAt: DateTime.parse(json['createdAt'] as String),
+    );
+  }
+
+  static BookingStatus _parseStatus(String status) {
+    switch (status) {
+      case 'pending':
+        return BookingStatus.pending;
+      case 'confirmed':
+        return BookingStatus.confirmed;
+      case 'cancelled':
+        return BookingStatus.cancelled;
+      case 'completed':
+        return BookingStatus.completed;
+      default:
+        return BookingStatus.confirmed;
+    }
+  }
 }

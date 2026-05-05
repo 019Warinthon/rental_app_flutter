@@ -2,11 +2,12 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:rental_app/core/config/colors.dart';
 import '../../home/pages/home_page.dart';
 import '../../profile/pages/profile_page.dart';
 import 'favorites_page.dart';
-import '../../../core/config/colors.dart';
 import '../providers/favorites_provider.dart';
+import '../../chat/pages/chat_list_page.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -23,12 +24,14 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
   static const _pages = [
     HomePage(),
     FavoritesPage(),
+    ChatListPage(),
     ProfilePage(),
   ];
 
   static const _navItems = [
     _NavItem(icon: LucideIcons.home, label: 'Home'),
     _NavItem(icon: LucideIcons.heart, label: 'Saved'),
+    _NavItem(icon: LucideIcons.messageCircle, label: 'Messages'),
     _NavItem(icon: LucideIcons.user, label: 'Profile'),
   ];
 
@@ -43,9 +46,10 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
       ),
     );
     _iconScales = _iconControllers.map((ctrl) {
-      return Tween<double>(begin: 1.0, end: 1.25).animate(
-        CurvedAnimation(parent: ctrl, curve: Curves.elasticOut),
-      );
+      return Tween<double>(
+        begin: 1.0,
+        end: 1.25,
+      ).animate(CurvedAnimation(parent: ctrl, curve: Curves.elasticOut));
     }).toList();
 
     // Animate initial tab
@@ -70,10 +74,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _pages,
-      ),
+      body: IndexedStack(index: _currentIndex, children: _pages),
       bottomNavigationBar: _buildNavBar(),
     );
   }
@@ -174,11 +175,8 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
               duration: const Duration(milliseconds: 200),
               style: TextStyle(
                 fontSize: 11,
-                fontWeight:
-                    isActive ? FontWeight.w600 : FontWeight.normal,
-                color: isActive
-                    ? AppColors.primary
-                    : AppColors.textSecondary,
+                fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
+                color: isActive ? AppColors.primary : AppColors.textSecondary,
               ),
               child: Text(item.label.toLowerCase().tr()),
             ),
